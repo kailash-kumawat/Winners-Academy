@@ -1,0 +1,22 @@
+{
+  "name": "winners-academy",
+  "version": "1.0.0",
+  "description": "A school web application for students and teacher, \n which student can see their results, get enroll in courses, know about school and faculty, also can get admission online and many more.",
+  "license": "ISC",
+  "author": "kailash kumawat",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0",
+    "mongoose-aggregate-paginate-v2": "^1.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  }
+}
