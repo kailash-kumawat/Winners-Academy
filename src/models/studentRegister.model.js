@@ -61,4 +61,5 @@ studentRegisterSchema.methods.generateRefreshToken = function () {
   });
 };
 
-export const Register = mongoose.model("Register", studentRegisterSchema);
+export const Student = mongoose.model("Student", studentRegisterSchema);
+export { generateAccessToken, generateRefreshToken };
