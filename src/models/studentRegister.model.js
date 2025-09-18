@@ -27,6 +27,10 @@ const studentRegisterSchema = new Schema(
     studentImage: {
       type: String, // from cloudinary
     },
+
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

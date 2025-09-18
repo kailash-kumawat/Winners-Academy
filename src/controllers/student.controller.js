@@ -71,4 +71,73 @@ const registerStudent = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerStudent };
+const generateAccessTokenAndRefreshToken = async (studentId) => {
+  try {
+    const student = await Student.findById(studentId);
+
+    const accessToken = student.generateAccessToken();
+    const refreshToken = student.generateRefreshToken();
+
+    student.refreshToken = refreshToken;
+    student.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "Something went wring while generating Access Token and Refresh Token"
+    );
+  }
+};
+
+const loggedInStudent = asyncHandler(async (req, res) => {
+  // extract email, pass from frontend
+  const { name, email, password } = req.body;
+  // check email, pass is not empty.
+  if (!(email && password && name)) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  // find user
+  const student = await Student.findOne({
+    $or: [{ email }, { name }],
+  });
+  // check if user exist or not.
+  if (!student) {
+    throw new ApiError(401, "Student does not exist");
+  }
+
+  // check for password is correct or not.
+  const isPasswordValid = await student.isPasswordCorrect(password);
+  if (!isPasswordValid) {
+    throw new ApiError(400, "Enter correct password");
+  }
+
+  //generate tokens
+  const { accessToken, refreshToken } =
+    await generateAccessTokenAndRefreshToken(student._id);
+
+  const loggedInStudent = await Student.findById(student._id).select(
+    "-password -refreshToken"
+  );
+
+  // send cookies
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  // login successfully.
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { student: loggedInStudent, accessToken, refreshToken },
+        "Student loggedIn successfully"
+      )
+    );
+});
+
+export { registerStudent, loggedInStudent };
